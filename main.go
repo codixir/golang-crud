@@ -72,6 +72,15 @@ func getBooks(w http.ResponseWriter, r *http.Request) {
 }
 
 func getBook(w http.ResponseWriter, r *http.Request) {
+	var book Book
+	params := mux.Vars(r)
+
+	row := db.QueryRow("select * from books where id=$1", params["id"])
+
+	err := row.Scan(&book.ID, &book.Title, &book.Author, &book.Year)
+	logFatal(err)
+
+	json.NewEncoder(w).Encode(book)
 }
 
 func addBook(w http.ResponseWriter, r *http.Request) {
