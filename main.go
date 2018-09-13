@@ -1,6 +1,7 @@
 package main
 
 import (
+	"database/sql"
 	"log"
 	"net/http"
 	"os"
@@ -18,6 +19,7 @@ type Book struct {
 }
 
 var books []Book
+var db *sql.DB
 
 func init() {
 	gotenv.Load()
@@ -31,9 +33,12 @@ func logFatal(err error) {
 
 func main() {
 	pgUrl, err := pq.ParseURL(os.Getenv("ELEPHANTSQL_URL"))
+
+	db, err = sql.Open("postgres", pgUrl)
 	logFatal(err)
 
-	log.Println(pgUrl)
+	err = db.Ping() //Check if the database is open
+	logFatal(err)
 
 	router := mux.NewRouter()
 
