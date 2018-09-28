@@ -22,6 +22,10 @@ func logFatal(err error) {
 	}
 }
 
+func enableCors(w *http.ResponseWriter) {
+	(*w).Header().Set("Access-Control-Allow-Origin", "*")
+}
+
 func (c Controller) GetBooks(db *sql.DB) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		var book models.Book
@@ -29,6 +33,8 @@ func (c Controller) GetBooks(db *sql.DB) http.HandlerFunc {
 		bookRepo := bookRepository.BookRepository{}
 
 		books = bookRepo.GetBooks(db, book, books)
+
+		enableCors(&w)
 
 		json.NewEncoder(w).Encode(books)
 	}
@@ -47,6 +53,8 @@ func (c Controller) GetBook(db *sql.DB) http.HandlerFunc {
 
 		book = bookRepo.GetBook(db, book, id)
 
+		enableCors(&w)
+
 		json.NewEncoder(w).Encode(book)
 	}
 }
@@ -61,6 +69,8 @@ func (c Controller) AddBook(db *sql.DB) http.HandlerFunc {
 		bookRepo := bookRepository.BookRepository{}
 		bookID = bookRepo.AddBook(db, book)
 
+		enableCors(&w)
+
 		json.NewEncoder(w).Encode(bookID)
 	}
 }
@@ -72,6 +82,8 @@ func (c Controller) UpdateBook(db *sql.DB) http.HandlerFunc {
 
 		bookRepo := bookRepository.BookRepository{}
 		rowsUpdated := bookRepo.UpdateBook(db, book)
+
+		enableCors(&w)
 
 		json.NewEncoder(w).Encode(rowsUpdated)
 	}
@@ -87,6 +99,8 @@ func (c Controller) RemoveBook(db *sql.DB) http.HandlerFunc {
 		logFatal(err)
 
 		rowsDeleted := bookRepo.RemoveBook(db, id)
+
+		enableCors(&w)
 
 		json.NewEncoder(w).Encode(rowsDeleted)
 	}
